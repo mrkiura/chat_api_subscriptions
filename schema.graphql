@@ -1,0 +1,51 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Query {
+    messages(userId: String!): messagesResult
+    hello: String!
+}
+
+type Message {
+    content: String
+    senderId: String
+    recipientId: String
+}
+
+type User {
+    username: String
+    userId: String
+}
+
+type createUserResult {
+    user: User
+    success: Boolean!
+    errors: [String]
+}
+
+type createMessageResult {
+    message: Message
+    success: Boolean!
+    errors: [String]
+}
+
+type messagesResult {
+    messages: [Message]
+    success: Boolean!
+    errors: [String]
+}
+
+type Mutation {
+    createMessage(senderId: String, recipientId: String, content: String):
+    createMessageResult
+    createUser(username: String!): createUserResult
+}
+
+type Subscription {
+    messages(userId: String): Message
+}
+
+
