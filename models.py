@@ -1,10 +1,10 @@
 import os
-from gino.ext.starlette import Gino
-
+from gino import Gino
 
 db = Gino(
-    database=os.getenv("DATABASE_NAME")
 )
+
+database_url = os.getenv("DATABASE_URL")
 
 
 class User(db.Model):
