@@ -6,7 +6,6 @@ from ariadne import convert_kwargs_to_snake_case, SubscriptionType
 subscription = SubscriptionType()
 
 
-@subscription.source("messages")
 @convert_kwargs_to_snake_case
 async def messages_source(obj, info, user_id):
     redis_url = os.getenv("REDIS_URL")
@@ -19,6 +18,16 @@ async def messages_source(obj, info, user_id):
         print(message)
         if message["recipient_id"] == user_id:
             yield message
+
+
+@subscription.source("messages")
+@convert_kwargs_to_snake_case
+async def messages_source_(obj, info, user_id):
+    # get the queue and retrieve the message
+    # retrieve message
+    message = {}
+    if message["recipient_id"] == user_id:
+        yield message
 
 
 @subscription.field("messages")
