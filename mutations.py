@@ -3,7 +3,7 @@ import os
 import aioredis
 from ariadne import ObjectType, convert_kwargs_to_snake_case
 
-from models import Message, User, db, database_url
+from store import users, messages, queue
 
 mutation = ObjectType("Mutation")
 
@@ -12,19 +12,17 @@ mutation = ObjectType("Mutation")
 @convert_kwargs_to_snake_case
 async def resolve_create_message(obj, info, content, sender_id, recipient_id):
     try:
-        redis_url = os.getenv("REDIS_URL")
-        channel_name = "MESSAGES"
-        publisher = await aioredis.create_redis(redis_url)
-        async with db.with_bind(database_url) as engine:
-            message = await Message.create(content=content, sender_id=sender_id,
-                                           recipient_id=recipient_id)
-            serialized_message = message.to_dict()
-            await publisher.publish_json(channel_name, serialized_message)
-            publisher.close()
-            return {
-                "success": True,
-                "message": serialized_message
-            }
+        message = {
+            "content": content,
+            "sender_id": sender_id,
+            "recipient_id": recipient_id
+        }
+        messages.append(message)
+        await queue.put(message)  # add the message to the queue
+        return {
+            "success": True,
+            "message": message
+        }
     except Exception as error:
         return {
             "success": False,
@@ -36,12 +34,17 @@ async def resolve_create_message(obj, info, content, sender_id, recipient_id):
 @convert_kwargs_to_snake_case
 async def resolve_create_user(obj, info, username):
     try:
-        async with db.with_bind(database_url) as engine:
-            user = await User.create(username=username)
+        if not users.get(username):
+            user = {
+                "user_id": len(users) + 1,
+                "username": username
+            }
+            users[username] = user
             return {
                 "success": True,
-                "user": user.to_dict()
+                "user": user
             }
+
     except Exception as error:
         return {
             "success": False,

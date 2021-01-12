@@ -6,7 +6,7 @@ schema {
 
 type Query {
     messages(userId: String!): messagesResult
-    hello: String!
+    userId(username: String!): String
 }
 
 type Message {

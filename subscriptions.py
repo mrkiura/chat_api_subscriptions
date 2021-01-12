@@ -3,31 +3,23 @@ import os
 import aioredis
 from ariadne import convert_kwargs_to_snake_case, SubscriptionType
 
+from store import queue
+
 subscription = SubscriptionType()
-
-
-@convert_kwargs_to_snake_case
-async def messages_source(obj, info, user_id):
-    redis_url = os.getenv("REDIS_URL")
-    channel_name = "MESSAGES"
-    subscriber = await aioredis.create_redis(redis_url)
-    channels = await subscriber.subscribe(channel_name)
-    channel = channels[0]
-    while await channel.wait_message():
-        message = await channel.get_json()
-        print(message)
-        if message["recipient_id"] == user_id:
-            yield message
 
 
 @subscription.source("messages")
 @convert_kwargs_to_snake_case
-async def messages_source_(obj, info, user_id):
-    # get the queue and retrieve the message
-    # retrieve message
-    message = {}
-    if message["recipient_id"] == user_id:
-        yield message
+async def messages_source(obj, info, user_id):
+    while True:
+        message = await queue.get()
+        # retrieve message and yield it if it matches our user
+        if message["recipient_id"] == user_id:
+            queue.task_done()
+            yield message
+        else:
+            # return the message to the queue (belongs to different user)
+            queue.put(message)
 
 
 @subscription.field("messages")
