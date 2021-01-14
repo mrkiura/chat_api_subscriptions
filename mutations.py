@@ -1,6 +1,3 @@
-import os
-
-import aioredis
 from ariadne import ObjectType, convert_kwargs_to_snake_case
 
 from store import users, messages, queue
@@ -44,6 +41,10 @@ async def resolve_create_user(obj, info, username):
                 "success": True,
                 "user": user
             }
+        return {
+            "success": False,
+            "errors": ["Username is taken"]
+        }
 
     except Exception as error:
         return {

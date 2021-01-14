@@ -1,6 +1,3 @@
-import os
-
-import aioredis
 from ariadne import convert_kwargs_to_snake_case, SubscriptionType
 
 from store import queue

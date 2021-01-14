@@ -8,9 +8,8 @@ query = ObjectType("Query")
 @convert_kwargs_to_snake_case
 async def resolve_messages(obj, info, user_id):
     def filter_by_userid(message):
-        if message["sender_id"] == user_id or \
-                message["recipient_id"] == user_id:
-            return message
+        return message["sender_id"] == user_id or \
+               message["recipient_id"] == user_id
 
     user_messages = filter(filter_by_userid, messages)
     return {
