@@ -1,6 +1,3 @@
-
-[RuntimeError]
-Poetry could not find a pyproject.toml file in /Users/kiura/dev/tutorials-self/code/chat_api or its parents
 aiodns==2.0.0
 aiofiles==0.4.0
 aiohttp==3.6.2
