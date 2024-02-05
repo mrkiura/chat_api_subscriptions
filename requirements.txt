@@ -19,7 +19,7 @@ chardet==3.0.4
 Click==7.0
 constantly==15.1.0
 container-transform==1.1.5
-cryptography==3.1.1
+cryptography==42.0.0
 decorator==4.4.1
 distlib==0.3.0
 Django==3.1.2
